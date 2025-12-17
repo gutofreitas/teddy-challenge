@@ -1,0 +1,75 @@
+{
+  "name": "frontend-vite",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/frontend-vite/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/vite:build",
+      "outputs": ["{workspaceRoot}/dist/apps/frontend-vite"],
+      "defaultConfiguration": "production",
+      "options": {
+        "root": "apps/frontend-vite",
+        "outputPath": "dist/apps/frontend-vite",
+        "configFile": "apps/frontend-vite/vite.config.ts"
+      },
+      "configurations": {
+        "development": {
+          "mode": "development"
+        },
+        "production": {
+          "mode": "production"
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/vite:dev-server",
+      "options": {
+        "root": "apps/frontend-vite",
+        "buildTarget": "frontend-vite:build",
+        "configFile": "apps/frontend-vite/vite.config.ts"
+      },
+      "configurations": {
+        "production": {
+          "buildTarget": "frontend-vite:build:production"
+        }
+      }
+    },
+    "preview": {
+      "executor": "@nx/vite:preview-server",
+      "options": {
+        "root": "apps/frontend-vite",
+        "buildTarget": "frontend-vite:build",
+        "configFile": "apps/frontend-vite/vite.config.ts"
+      },
+      "configurations": {
+        "production": {
+          "buildTarget": "frontend-vite:build:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/frontend-vite/**/*.{ts,tsx,js,jsx}"]
+      }
+    },
+    "test": {
+      "executor": "@nx/vite:test",
+      "outputs": ["{workspaceRoot}/coverage/apps/frontend-vite"],
+      "options": {
+        "passWithNoTests": true,
+        "reportsDirectory": "../../coverage/apps/frontend-vite",
+        "configFile": "apps/frontend-vite/vitest.config.ts"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit -p apps/frontend-vite/tsconfig.app.json"
+      }
+    }
+  }
+}

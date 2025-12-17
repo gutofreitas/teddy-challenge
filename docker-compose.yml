@@ -1,0 +1,50 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=teddy
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - JWT_SECRET=dev-secret
+      - ADMIN_EMAIL=admin@teddy.local
+      - ADMIN_PASSWORD=admin123
+      - DB_PROVIDER=postgres
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/teddy
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend-vite/Dockerfile
+    ports:
+      - "4173:4173"
+    environment:
+      - VITE_API_URL=http://backend:3000/api
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
